@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/auth/**
+        - id: product-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/product/**
+          filters:
+            - AuthenticationFilter
+        - id: order-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/order/**
+          filters:
+            - AuthenticationFilter
+
+eureka:
+  client:
+    serviceUrl:
+      default-zone: http://localhost:8761/eureka/
+
+security:
+  jwt:
+    ## jwt secret key
+    secret-key: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
+    ## jwt expiration time (1h in millisecond)
+    expiration-time: 3600000
+
+server:
+  port: 8080
