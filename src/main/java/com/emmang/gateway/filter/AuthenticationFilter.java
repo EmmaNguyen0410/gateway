@@ -1,5 +1,8 @@
 package com.emmang.gateway.filter;
 
+import com.emmang.gateway.constant.ExceptionMessage;
+import com.emmang.gateway.exception.InvalidTokenException;
+import com.emmang.gateway.exception.MissingAuthorizationException;
 import com.emmang.gateway.util.JWTUtil;
 import io.jsonwebtoken.Claims;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -32,16 +35,16 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 if (authHeader != null && authHeader.startsWith("Bearer ")) {
                     token = authHeader.substring(7);
                 } else {
-                    throw new RuntimeException("Missing Authorization Header");
+                    throw new MissingAuthorizationException(ExceptionMessage.MISSING_AUTHORIZATION);
                 }
 
                 try {
                     if (!jwtUtil.isTokenValid(token)) {
-                        throw new RuntimeException("Invalid JWT Token");
+                        throw new InvalidTokenException(ExceptionMessage.INVALID_TOKEN);
                     }
                     return chain.filter(populateRequestWithHeaders(exchange, jwtUtil.extractAllClaims(token)));
                 } catch (Exception e) {
-                    throw new RuntimeException("Invalid JWT Token");
+                    throw new InvalidTokenException(ExceptionMessage.INVALID_TOKEN);
                 }
             }
             return chain.filter(exchange);
